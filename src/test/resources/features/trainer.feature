@@ -10,6 +10,14 @@ Feature: Guessing a word
   As a User,
   I want to be able to fill in a 5,6 or 7 letter word,
   So that I can try to attempt a guess
+Scenario Outline: Guessing a word
+  Given I am playing a game,
+  When My "<guess>" has the same amount of letters as the "<word>"
+  Then I get to see "<feedback>" which tells me if on of the letters are correct, absent or present
+  Examples:
+    | word       | guess     | feedback                                             |
+    | world      | earth     | INVALID, INVALID, CORRECT, INVALID, INVALID          |
+    | laptop     | laptop    | CORRECT, CORRECT, CORRECT, CORRECT, CORRECT, CORRECT |
 
 Feature: Get feedback
   As a User,
