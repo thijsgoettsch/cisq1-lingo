@@ -1,7 +1,10 @@
-Feature: Starting a game
+Feature: Starting a new game
   As a User,
-  I want to start a game,
-  In order to begin playing the game
+  I want to start a new game,
+  So that I can play a new game
+Scenario: A new game has been started
+  When I start a new game
+  Then I should be able to play the game
 
 Feature: Guessing a word
   As a User,
