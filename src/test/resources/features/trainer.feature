@@ -16,7 +16,7 @@ Feature: Get feedback
   I want to be able to see feedback on the attempt I made for guessing a word,
   So that I know what letter is correct, incorrect or in the wrong spot
 
-Feature: Going to the next round
+Feature: Starting a new round
   As a User,
   I want to be able to start a new round,
   So that I can continue playing the game
