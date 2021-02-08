@@ -16,7 +16,7 @@ Scenario Outline: Guessing a word
   Then I get to see "<feedback>" which tells me if on of the letters are correct, absent or present
   Examples:
     | word       | guess     | feedback                                             |
-    | world      | earth     | INVALID, INVALID, CORRECT, INVALID, INVALID          |
+    | world      | earth     | ABSENT, ABSENT, CORRECT, ABSENT, ABSENT          |
     | laptop     | laptop    | CORRECT, CORRECT, CORRECT, CORRECT, CORRECT, CORRECT |
 
 Feature: Get feedback
