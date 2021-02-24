@@ -47,7 +47,7 @@ class FeedbackTest {
     @DisplayName("Give hint when an attempt has been made")
     void giveHint(String attempt, String wordToGuess, List<Character> hint) {
         Feedback feedback = new Feedback(attempt, List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        assertEquals(feedback.giveHint(List.of('.', '.', 'o', '.', '.'), wordToGuess), hint);
+        assertEquals(feedback.giveHint(wordToGuess), hint);
     }
 
     static Stream<Arguments> provideHintExamples() {

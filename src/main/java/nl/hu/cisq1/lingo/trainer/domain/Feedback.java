@@ -26,7 +26,7 @@ public class Feedback {
         return marks.stream().anyMatch(Mark.INVALID::equals);
     }
 
-    public List<Character> giveHint(List<Character> previousHint, String wordToGuess) {
+    public List<Character> giveHint(String wordToGuess) {
         List<Character> hint = new ArrayList<>();
         char[] attempt = this.attempt.toLowerCase().toCharArray();
         char[] correctWord = wordToGuess.toLowerCase().toCharArray();

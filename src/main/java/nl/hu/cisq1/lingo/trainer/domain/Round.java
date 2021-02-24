@@ -3,42 +3,45 @@ package nl.hu.cisq1.lingo.trainer.domain;
 import nl.hu.cisq1.lingo.trainer.domain.Feedback;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Round {
-    private int currentRound;
+
     private int currentTurn;
     private Word wordToGuess;
-    private Feedback feedback;
-    private final static int MAX_TURNS = 5;
+    private List<Feedback> feedbackList = new ArrayList<>();
 
-    public Round(Word word, Feedback feedback) {
+    public Round(Word word) {
         this.wordToGuess = word;
-        this.feedback = feedback;
-        this.currentRound = 1;
-        this.currentTurn = 1;
-
+        this.currentTurn = 0;
     }
 
-    public boolean increaseRound() {
-        if (feedback.isWordGuessed()) {
-            this.currentRound = this.currentTurn + 1;
-            this.currentTurn = 1;
+    public boolean roundFinished() {
+        if (currentTurn > 5 || feedbackList.stream().anyMatch(Feedback::isWordGuessed)) {
             return true;
         }
         return false;
+    }
+
+    public List<Character> getFeedback(String attempt, List<Mark> marks) {
+        Feedback feedback = new Feedback(attempt, marks);
+        feedbackList.add(feedback);
+        increaseTurn();
+        return feedback.giveHint(this.wordToGuess.getValue());
     }
 
     public boolean increaseTurn() {
-        if (!feedback.isWordGuessed()) {
-            this.currentTurn = this.currentTurn + 1;
+        if (feedbackList.stream().noneMatch(Feedback::isWordGuessed)) {
+            this.currentTurn += 1;
             return true;
         }
         return false;
     }
 
-    public List<Character> giveFeedback(List<Character> previousHint) {
-        return feedback.giveHint(previousHint, this.wordToGuess.getValue());
+    public int getCurrentTurn() {
+        return this.currentTurn;
     }
+
 }
 

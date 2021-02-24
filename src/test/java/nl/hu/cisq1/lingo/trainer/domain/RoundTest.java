@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -14,54 +15,75 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoundTest {
-
     @Test
-    @DisplayName("increase round number when the word has been guessed")
-    void increaseRoundNumber() {
+    @DisplayName("round is finished based on the word that has been guessed")
+    void roundIsFinished() {
         Word word = new Word("boord");
-        Feedback feedback = new Feedback("boord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        Round round = new Round(word, feedback);
-        assertTrue(round.increaseRound());
+        Round round = new Round(word);
+        round.getFeedback("boord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        assertTrue(round.roundFinished());
     }
 
     @Test
-    @DisplayName("Dont increase round number when the word has not been guessed")
-    void dontIncreaseRoundNumber() {
+    @DisplayName("round is not finished based on guess attempt that has been made")
+    void roundIsNotFinished() {
         Word word = new Word("woord");
-        Feedback feedback = new Feedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        Round round = new Round(word, feedback);
-        assertFalse(round.increaseRound());
+        Round round = new Round(word);
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        assertFalse(round.roundFinished());
     }
 
     @Test
-    @DisplayName("increase turn number when the word has not been guessed")
+    @DisplayName("round is not finished based on too many guesses")
+    void roundIsNotFinishedTooManyAttempts() {
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        assertFalse(round.roundFinished());
+    }
+
+    @Test
+    @DisplayName("Increase turn number when word has not been guessed")
     void increaseTurnNumber() {
-        Word word = new Word("neef");
-        Feedback feedback = new Feedback("hout", List.of(Mark.ABSENT, Mark.ABSENT, Mark.ABSENT, Mark.ABSENT));
-        Round round = new Round(word, feedback);
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
         assertTrue(round.increaseTurn());
     }
 
     @Test
-    @DisplayName("do not increase turn number when the word has been guessed")
+    @DisplayName("Dont increase turn number when word has been guessed")
     void dontIncreaseTurnNumber() {
-        Word word = new Word("neef");
-        Feedback feedback = new Feedback("neef", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        Round round = new Round(word, feedback);
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
         assertFalse(round.increaseTurn());
     }
 
-    @ParameterizedTest
-    @MethodSource("provideHintExamples")
-    @DisplayName("Give hint when an attempt has been made")
-    void giveHint(String attempt, Word wordToGuess, List<Character> hint) {
-
-        Word word = new Word(wordToGuess.getValue());
-        Feedback feedback = new Feedback(attempt, List.of(Mark.ABSENT, Mark.ABSENT, Mark.ABSENT, Mark.ABSENT));
-        Round round = new Round(word, feedback);
-
-        assertEquals(round.giveFeedback(List.of('.', '.', 'o', '.', '.')), hint);
+    @Test
+    @DisplayName("check if turn number matches")
+    void checkCurrentTurnNumber() {
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        assertEquals(round.getCurrentTurn(), 2);
     }
+
+    @ParameterizedTest()
+    @MethodSource("provideHintExamples")
+    @DisplayName("get feedback when a guess has been made")
+    void getFeedback(String attempt, String wordToGuess, List<Character> hint) {
+        Word word = new Word(wordToGuess);
+        Round round = new Round(word);
+        assertEquals(round.getFeedback(attempt, List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)), hint);
+    }
+
 
     static Stream<Arguments> provideHintExamples() {
         return Stream.of(
