@@ -10,6 +10,7 @@ public class Round {
     private int currentTurn;
     private Word wordToGuess;
     private Feedback feedback;
+    private final static int MAX_TURNS = 5;
 
     public Round(Word word, Feedback feedback) {
         this.wordToGuess = word;
