@@ -34,7 +34,7 @@ class RoundTest {
     }
 
     @Test
-    @DisplayName("round is not finished based on too many guesses")
+    @DisplayName("round is finished based on too many guesses")
     void roundIsNotFinishedTooManyAttempts() {
         Word word = new Word("woord");
         Round round = new Round(word);
