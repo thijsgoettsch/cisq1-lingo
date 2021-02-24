@@ -75,6 +75,17 @@ class RoundTest {
         assertEquals(round.getCurrentTurn(), 2);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideFeedbackExamples")
+    @DisplayName("see all the feedback that has been given during a round")
+    void getFeedbackFromCurrentRound(String wordToGuess, List<Feedback> feedbackList) {
+        Word word = new Word(wordToGuess);
+        Round round = new Round(word);
+        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        assertEquals(round.getAllFeedback(), feedbackList);
+    }
+
     @ParameterizedTest()
     @MethodSource("provideHintExamples")
     @DisplayName("get feedback when a guess has been made")
@@ -90,6 +101,12 @@ class RoundTest {
                 Arguments.of("woord", "boord", List.of('.', 'o', 'o', 'r', 'd')),
                 Arguments.of("dansje", "diesel", List.of('d', '.', '.', 's', '.', '.')),
                 Arguments.of("boom", "kies", List.of('.', '.', '.', '.'))
+        );
+    }
+
+    static Stream<Arguments> provideFeedbackExamples() {
+        return Stream.of(
+                Arguments.of("woord", List.of(new Feedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)), new Feedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT))))
         );
     }
 }

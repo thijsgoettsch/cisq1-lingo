@@ -5,11 +5,13 @@ import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Round {
 
     private int currentTurn;
     private Word wordToGuess;
+
     private List<Feedback> feedbackList = new ArrayList<>();
 
     public Round(Word word) {
@@ -18,7 +20,7 @@ public class Round {
     }
 
     public boolean roundFinished() {
-        if (currentTurn > 5 || feedbackList.stream().anyMatch(Feedback::isWordGuessed)) {
+        if (currentTurn >= 5 || feedbackList.stream().anyMatch(Feedback::isWordGuessed)) {
             return true;
         }
         return false;
@@ -43,5 +45,32 @@ public class Round {
         return this.currentTurn;
     }
 
+    public List<Feedback> getAllFeedback() {
+        return this.feedbackList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Round round = (Round) o;
+        return currentTurn == round.currentTurn &&
+                Objects.equals(wordToGuess, round.wordToGuess) &&
+                Objects.equals(feedbackList, round.feedbackList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTurn, wordToGuess, feedbackList);
+    }
+
+    @Override
+    public String toString() {
+        return "Round{" +
+                "currentTurn=" + currentTurn +
+                ", wordToGuess=" + wordToGuess +
+                ", feedbackList=" + feedbackList +
+                '}';
+    }
 }
 
