@@ -44,7 +44,7 @@ class RoundTest {
         round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
         round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
         round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        assertFalse(round.roundFinished());
+        assertTrue(round.roundFinished());
     }
 
     @Test
