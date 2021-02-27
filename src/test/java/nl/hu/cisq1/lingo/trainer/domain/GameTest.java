@@ -66,6 +66,26 @@ class GameTest {
         });
     }
 
+    @ParameterizedTest
+    @MethodSource("provideFinishedRoundExamples")
+    @DisplayName("should not throw an exception when trying to start a new round while all the rounds are finished")
+    void shouldNotThrowExceptionOnFinishedRound(String wordToGuess, String attempt, List<Mark> marks, Round round) {
+        Player player = new Player("Speler1");
+        List<Round> rounds = new ArrayList<>();
+        Word word = new Word(wordToGuess);
+        Score score = new Score(25);
+
+        Game lingo = new Game(player, rounds, score);
+
+        Round newRound = new Round(word);
+        newRound.getFeedback(attempt, marks);
+        rounds.add(newRound);
+
+        assertDoesNotThrow(() -> {
+            lingo.startNewRound(word);
+        });
+    }
+
 
     static Stream<Arguments> provideFinishedRoundExamples() {
         return Stream.of(

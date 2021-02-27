@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Game {
     private Player player;
-    private List<Round> rounds = new ArrayList<>();
+    private List<Round> rounds;
     private Score score;
     public Game(Player player, List<Round> rounds, Score score) {
         this.player = player;
