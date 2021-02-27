@@ -1,6 +1,7 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.Feedback;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.TurnNumberOutOfRangeException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class RoundTest {
         Word word = new Word("woord");
         Round round = new Round(word);
         round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        assertTrue(round.increaseTurn());
+        assertTrue(round.increaseTurn(1));
     }
 
     @Test
@@ -62,7 +63,20 @@ class RoundTest {
         Word word = new Word("woord");
         Round round = new Round(word);
         round.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        assertFalse(round.increaseTurn());
+        assertFalse(round.increaseTurn(1));
+    }
+
+    @Test
+    @DisplayName("Dont increase turn number when turn number is 5 or greater than 5")
+    void dontIncreaseTurnNumberBasedOnAmountOfTurns() {
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        assertFalse(round.increaseTurn(1));
     }
 
     @Test
@@ -86,7 +100,7 @@ class RoundTest {
         assertEquals(round.getAllFeedback(), feedbackList);
     }
 
-    @ParameterizedTest()
+    @ParameterizedTest
     @MethodSource("provideHintExamples")
     @DisplayName("get feedback when a guess has been made")
     void getFeedback(String attempt, String wordToGuess, List<Character> hint) {
@@ -95,6 +109,15 @@ class RoundTest {
         assertEquals(round.getFeedback(attempt, List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)), hint);
     }
 
+
+    @Test
+    @DisplayName("see if new score has been created based on the turns of a round")
+    void getScoreOfRound() {
+        Word word = new Word("test");
+        Round round = new Round(word);
+        round.increaseTurn(1);
+        assertEquals(round.roundScore(), new Score(1));
+    }
 
     static Stream<Arguments> provideHintExamples() {
         return Stream.of(
