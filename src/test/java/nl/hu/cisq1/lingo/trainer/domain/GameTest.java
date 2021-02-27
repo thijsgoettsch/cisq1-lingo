@@ -23,8 +23,8 @@ class GameTest {
         Player player = new Player("Speler1");
         List<Round> rounds = new ArrayList<>();
         Word word = new Word(wordToGuess);
-        Score score = new Score(0);
-        Game lingo = new Game(player, rounds, score);
+
+        Game lingo = new Game(player, rounds);
 
         assertEquals(lingo.startNewGame(word), round);
     }
@@ -36,8 +36,8 @@ class GameTest {
         Player player = new Player("Speler1");
         List<Round> rounds = new ArrayList<>();
         Word word = new Word(wordToGuess);
-        Score score = new Score(0);
-        Game lingo = new Game(player, rounds, score);
+
+        Game lingo = new Game(player, rounds);
 
         Round newRound = new Round(word);
         newRound.getFeedback(attempt, marks);
@@ -53,9 +53,8 @@ class GameTest {
         Player player = new Player("Speler1");
         List<Round> rounds = new ArrayList<>();
         Word word = new Word(wordToGuess);
-        Score score = new Score(25);
 
-        Game lingo = new Game(player, rounds, score);
+        Game lingo = new Game(player, rounds);
 
         Round newRound = new Round(word);
         newRound.getFeedback(attempt, marks);
@@ -73,9 +72,8 @@ class GameTest {
         Player player = new Player("Speler1");
         List<Round> rounds = new ArrayList<>();
         Word word = new Word(wordToGuess);
-        Score score = new Score(25);
 
-        Game lingo = new Game(player, rounds, score);
+        Game lingo = new Game(player, rounds);
 
         Round newRound = new Round(word);
         newRound.getFeedback(attempt, marks);
@@ -86,13 +84,33 @@ class GameTest {
         });
     }
 
+    @Test
+    @DisplayName("calculate the total score")
+    void calculateScore() {
+        Player player = new Player("Speler1");
+        List<Round> rounds = new ArrayList<>();
+        Word word = new Word("test");
+
+        Game lingo = new Game(player, rounds);
+
+        Round newRound = new Round(word);
+        newRound.getFeedback("test", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        newRound.getFeedback("test", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+
+        Round newRound2 = new Round(word);
+        newRound2.getFeedback("test", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        rounds.add(newRound);
+        rounds.add(newRound2);
+
+        assertEquals(lingo.calculateScore(), 45);
+    }
+
 
     static Stream<Arguments> provideFinishedRoundExamples() {
         return Stream.of(
                 Arguments.of("tosti", "tosti", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("tosti"))),
                 Arguments.of("hallo", "hallo", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("hallo"))),
-                Arguments.of("zestig", "zestig", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("zestig"))),
-                Arguments.of("vier", "vier", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("vier")))
+                Arguments.of("zestig", "zestig", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("zestig")))
         );
     }
 
@@ -100,8 +118,7 @@ class GameTest {
         return Stream.of(
                 Arguments.of("tosti", "josti", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("tosti"))),
                 Arguments.of("hallo", "haloo", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.PRESENT, Mark.CORRECT), new Round(new Word("hallo"))),
-                Arguments.of("zestig", "westig", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("zestig"))),
-                Arguments.of("vier", "bier", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("vier")))
+                Arguments.of("zestig", "westig", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT), new Round(new Word("zestig")))
         );
     }
 

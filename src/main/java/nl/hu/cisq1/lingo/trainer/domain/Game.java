@@ -9,11 +9,12 @@ import java.util.List;
 public class Game {
     private Player player;
     private List<Round> rounds;
-    private Score score;
-    public Game(Player player, List<Round> rounds, Score score) {
+
+    private int totalScore;
+
+    public Game(Player player, List<Round> rounds) {
         this.player = player;
         this.rounds = rounds;
-        this.score = score;
     }
 
     public Round startNewGame(Word word) {
@@ -29,6 +30,15 @@ public class Game {
         Round round = new Round(word);
         rounds.add(round);
         return round;
+    }
+
+    public int calculateScore() {
+        for (int i = 0; i < rounds.size(); i++) {
+            if(rounds.get(i).roundFinished()) {
+                totalScore += rounds.get(i).roundScore().calculateScore();
+            }
+        }
+        return totalScore;
     }
 
 }
