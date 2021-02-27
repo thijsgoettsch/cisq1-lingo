@@ -58,6 +58,10 @@ public class Round {
         return new Score(this.currentTurn);
     }
 
+    public int getWordLength() {
+        return this.wordToGuess.getLength();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

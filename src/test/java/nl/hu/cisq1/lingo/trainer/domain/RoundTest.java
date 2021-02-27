@@ -86,7 +86,7 @@ class RoundTest {
         Round round = new Round(word);
         round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
         round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        assertEquals(round.getCurrentTurn(), 2);
+        assertEquals(2, round.getCurrentTurn());
     }
 
     @ParameterizedTest
@@ -97,7 +97,7 @@ class RoundTest {
         Round round = new Round(word);
         round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
         round.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        assertEquals(round.getAllFeedback(), feedbackList);
+        assertEquals(feedbackList, round.getAllFeedback());
     }
 
     @ParameterizedTest
@@ -109,6 +109,14 @@ class RoundTest {
         assertEquals(round.getFeedback(attempt, List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)), hint);
     }
 
+    @Test
+    @DisplayName("get the length of the word that needs to be quessed")
+    void getWordLength() {
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        assertEquals(5, round.getWordLength());
+    }
+
 
     @Test
     @DisplayName("see if new score has been created based on the turns of a round")
@@ -116,7 +124,7 @@ class RoundTest {
         Word word = new Word("test");
         Round round = new Round(word);
         round.increaseTurn(1);
-        assertEquals(round.roundScore(), new Score(1));
+        assertEquals(new Score(1), round.roundScore());
     }
 
     static Stream<Arguments> provideHintExamples() {

@@ -10,6 +10,6 @@ class PlayerTest {
     @DisplayName("check if playername is correct")
     void checkPlayerName() {
         Player player = new Player("Jim");
-        assertEquals(player.getName(), "Jim");
+        assertEquals("Jim", player.getName());
     }
 }

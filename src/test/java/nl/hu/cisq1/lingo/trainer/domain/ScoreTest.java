@@ -19,7 +19,7 @@ class ScoreTest {
     @DisplayName("calculate score based on the amount of turns")
     void calculateScore(int turnNumber, int totalScore) {
         Score score = new Score(turnNumber);
-        assertEquals(score.calculateScore(), totalScore);
+        assertEquals(totalScore, score.calculateScore());
     }
 
     @ParameterizedTest
