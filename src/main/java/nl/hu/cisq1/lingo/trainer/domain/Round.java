@@ -29,14 +29,19 @@ public class Round {
     public List<Character> getFeedback(String attempt, List<Mark> marks) {
         Feedback feedback = new Feedback(attempt, marks);
         feedbackList.add(feedback);
-        increaseTurn();
+        if (!roundFinished()) {
+            increaseTurn(1);
+        }
         return feedback.giveHint(this.wordToGuess.getValue());
     }
 
-    public boolean increaseTurn() {
-        if (feedbackList.stream().noneMatch(Feedback::isWordGuessed)) {
-            this.currentTurn += 1;
-            return true;
+    public boolean increaseTurn(Integer amount) {
+        if (!roundFinished()) {
+            if (feedbackList.stream().noneMatch(Feedback::isWordGuessed)) {
+                this.currentTurn += amount;
+                return true;
+            }
+            return false;
         }
         return false;
     }
@@ -47,6 +52,10 @@ public class Round {
 
     public List<Feedback> getAllFeedback() {
         return this.feedbackList;
+    }
+
+    public Score roundScore() {
+        return new Score(this.currentTurn);
     }
 
     @Override

@@ -25,9 +25,16 @@ class ScoreTest {
     @ParameterizedTest
     @MethodSource("provideTurnNumbersGreaterThanMaxTurns")
     @DisplayName("throws exeption when the turn number is higher than 5")
-    void calculateScoreInvalidTurnNumer(int turnNumber) {
+    void shouldThrowExceptionInvalidTurnNumer(int turnNumber) {
+        assertThrows(TurnNumberOutOfRangeException.class, () -> new Score(turnNumber));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTurnNumbers")
+    @DisplayName("throws exeption when the turn number is higher than 5")
+    void shouldNotThrowExceptionCalculateScoreInvalidTurnNumer(int turnNumber) {
         Score score = new Score(turnNumber);
-        assertThrows(TurnNumberOutOfRangeException.class, score::calculateScore);
+        assertDoesNotThrow(score::calculateScore);
     }
 
     static Stream<Arguments> provideTurnNumbersGreaterThanMaxTurns() {
@@ -40,11 +47,11 @@ class ScoreTest {
 
     static Stream<Arguments> provideTurnNumbers() {
         return Stream.of(
-                Arguments.of(1, 25),
-                Arguments.of(2, 20),
-                Arguments.of(3, 15),
-                Arguments.of(4, 10),
-                Arguments.of(5, 5)
+                Arguments.of(0, 25),
+                Arguments.of(1, 20),
+                Arguments.of(2, 15),
+                Arguments.of(3, 10),
+                Arguments.of(4, 5)
                 );
     }
 }
