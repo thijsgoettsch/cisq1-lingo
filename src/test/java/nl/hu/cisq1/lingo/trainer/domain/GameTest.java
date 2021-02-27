@@ -49,7 +49,7 @@ class GameTest {
     @ParameterizedTest
     @MethodSource("provideUnfinishedRoundExamples")
     @DisplayName("throws an exception when trying to start a new round while there is still a round that has not been finished")
-    void throwExceptionOnUnfinishedRound(String wordToGuess, String attempt, List<Mark> marks, Round round) {
+    void throwExceptionOnUnfinishedRound(String wordToGuess, String attempt, List<Mark> marks) {
         Player player = new Player("Speler1");
         List<Round> rounds = new ArrayList<>();
         Word word = new Word(wordToGuess);
@@ -69,7 +69,7 @@ class GameTest {
     @ParameterizedTest
     @MethodSource("provideFinishedRoundExamples")
     @DisplayName("should not throw an exception when trying to start a new round while all the rounds are finished")
-    void shouldNotThrowExceptionOnFinishedRound(String wordToGuess, String attempt, List<Mark> marks, Round round) {
+    void shouldNotThrowExceptionOnFinishedRound(String wordToGuess, String attempt, List<Mark> marks) {
         Player player = new Player("Speler1");
         List<Round> rounds = new ArrayList<>();
         Word word = new Word(wordToGuess);
