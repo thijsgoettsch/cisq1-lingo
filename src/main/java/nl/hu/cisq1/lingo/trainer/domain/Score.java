@@ -8,6 +8,7 @@ import java.util.Objects;
 @ToString
 @EqualsAndHashCode
 public class Score {
+
     int score;
     int turns;
 
