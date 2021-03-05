@@ -1,12 +1,15 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import nl.hu.cisq1.lingo.trainer.domain.Feedback;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+@ToString
+@EqualsAndHashCode
 public class Round {
 
     private int currentTurn;
@@ -62,28 +65,5 @@ public class Round {
         return this.wordToGuess.getLength();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Round round = (Round) o;
-        return currentTurn == round.currentTurn &&
-                Objects.equals(wordToGuess, round.wordToGuess) &&
-                Objects.equals(feedbackList, round.feedbackList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(currentTurn, wordToGuess, feedbackList);
-    }
-
-    @Override
-    public String toString() {
-        return "Round{" +
-                "currentTurn=" + currentTurn +
-                ", wordToGuess=" + wordToGuess +
-                ", feedbackList=" + feedbackList +
-                '}';
-    }
 }
 

@@ -1,12 +1,15 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.repository.query.Param;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
+@ToString
+@EqualsAndHashCode
 public class Feedback {
     private String attempt;
     private List<Mark> marks;
@@ -42,27 +45,5 @@ public class Feedback {
             }
         }
         return hint;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Feedback feedback = (Feedback) o;
-        return Objects.equals(attempt, feedback.attempt) &&
-                Objects.equals(marks, feedback.marks);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(attempt, marks);
-    }
-
-    @Override
-    public String toString() {
-        return "Feedback{" +
-                "attempt='" + attempt + '\'' +
-                ", marks=" + marks +
-                '}';
     }
 }
