@@ -1,6 +1,8 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
+import lombok.Getter;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.GameIsNotActiveException;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundAlreadyFinishedException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundNotFinishedException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
@@ -12,6 +14,7 @@ public class Game {
     private List<Round> rounds;
     private Round currentRound;
     private boolean isGameActive;
+    @Getter
     private int totalScore;
 
     public Game(Player player, List<Round> rounds) {
@@ -23,6 +26,7 @@ public class Game {
     public void startNewGame(Word word) {
         this.isGameActive = true;
         startNewRound(word);
+
     }
 
     public void startNewRound(Word word) {
@@ -32,8 +36,21 @@ public class Game {
         if (!rounds.stream().allMatch(Round::roundFinished)) {
             throw new RoundNotFinishedException();
         }
+
         Round round = new Round(word);
         rounds.add(round);
+    }
+
+    public Round makeGuess(String attempt) {
+        if (!isGameActive) {
+            throw new GameIsNotActiveException();
+        }
+        if (rounds.stream().allMatch(Round::roundFinished)) {
+            throw new RoundAlreadyFinishedException();
+        }
+        getCurrentRound();
+        this.currentRound.makeGuess(attempt);
+        return this.currentRound;
     }
 
     public Round getCurrentRound() {
@@ -54,9 +71,9 @@ public class Game {
     }
 
     public int calculateScore() {
-        for (int i = 0; i < rounds.size(); i++) {
-            if(rounds.get(i).roundFinished()) {
-                totalScore += rounds.get(i).roundScore().calculateScore();
+        for (Round round : rounds) {
+            if (round.roundFinished()) {
+                totalScore += round.roundScore().calculateScore();
             }
         }
         return totalScore;

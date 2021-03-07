@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 @ToString
 @EqualsAndHashCode
 public class Feedback {
     private String attempt;
-    private List<Mark> marks;
-    public Feedback(String attempt, List<Mark> marks) {
+    private List<Mark> marks = new ArrayList<>();
+
+    public Feedback(String attempt) {
         this.attempt = attempt;
-        this.marks = marks;
+
     }
 
     public boolean isWordGuessed() {
@@ -23,7 +25,7 @@ public class Feedback {
     }
 
     public boolean guessIsInvalid() {
-        if(this.marks.size() != this.attempt.length()) {
+        if (this.marks.size() != this.attempt.length()) {
             return true;
         }
         return marks.stream().anyMatch(Mark.INVALID::equals);
@@ -35,6 +37,7 @@ public class Feedback {
         char[] correctWord = wordToGuess.toLowerCase().toCharArray();
         int minLength = Math.min(attempt.length, correctWord.length);
 
+
         for (int i = 0; i < minLength; i++) {
             if (attempt[i] == correctWord[i]) {
                 // letter is correct
@@ -44,6 +47,30 @@ public class Feedback {
                 hint.add('.');
             }
         }
+        generateMarks(wordToGuess);
         return hint;
     }
+
+    public List<Mark> generateMarks(String wordToGuess) {
+        if(wordToGuess.length() != this.attempt.length()){
+            for(int i = 0; i < this.attempt.length(); i++){
+                this.marks.add(Mark.INVALID);
+            }
+        } else {
+            for (int i = 0; i < this.attempt.length(); i++) {
+                if (wordToGuess.indexOf(this.attempt.charAt(i)) != -1) {
+                    if (wordToGuess.charAt(i) == this.attempt.charAt(i)) {
+                        this.marks.add(Mark.CORRECT);
+                    } else {
+                        this.marks.add(Mark.PRESENT);
+                    }
+                } else {
+                    this.marks.add(Mark.ABSENT);
+                }
+            }
+        }
+        return this.marks;
+    }
+
+
 }

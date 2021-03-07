@@ -21,7 +21,7 @@ public class Score {
     }
 
     public int calculateScore() {
-        return this.score = 5 * (5 - (this.turns + 1)) + 5;
+        return this.score = 5 * (5 - this.turns) + 5;
     }
 
 

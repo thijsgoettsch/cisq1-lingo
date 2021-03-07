@@ -1,6 +1,8 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.Feedback;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundAlreadyFinishedException;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundNotFinishedException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.TurnNumberOutOfRangeException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +23,7 @@ class RoundTest {
     void roundIsFinished() {
         Word word = new Word("boord");
         Round round = new Round(word);
-        round.getFeedback("boord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("boord");
         assertTrue(round.roundFinished());
     }
 
@@ -30,21 +32,20 @@ class RoundTest {
     void roundIsNotFinished() {
         Word word = new Word("woord");
         Round round = new Round(word);
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("boord");
         assertFalse(round.roundFinished());
     }
 
     @Test
     @DisplayName("round is finished based on too many guesses")
-    void roundIsNotFinishedTooManyAttempts() {
+    void roundIsFinishedTooManyAttempts() {
         Word word = new Word("woord");
         Round round = new Round(word);
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
         assertTrue(round.roundFinished());
     }
 
@@ -53,7 +54,7 @@ class RoundTest {
     void increaseTurnNumber() {
         Word word = new Word("woord");
         Round round = new Round(word);
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("boord");
         assertTrue(round.increaseTurn(1));
     }
 
@@ -62,7 +63,7 @@ class RoundTest {
     void dontIncreaseTurnNumber() {
         Word word = new Word("woord");
         Round round = new Round(word);
-        round.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("woord");
         assertFalse(round.increaseTurn(1));
     }
 
@@ -71,11 +72,11 @@ class RoundTest {
     void dontIncreaseTurnNumberBasedOnAmountOfTurns() {
         Word word = new Word("woord");
         Round round = new Round(word);
-        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
         assertFalse(round.increaseTurn(1));
     }
 
@@ -84,8 +85,8 @@ class RoundTest {
     void checkCurrentTurnNumber() {
         Word word = new Word("woord");
         Round round = new Round(word);
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("boord");
+        round.makeGuess("woord");
         assertEquals(2, round.getCurrentTurn());
     }
 
@@ -95,18 +96,43 @@ class RoundTest {
     void getFeedbackFromCurrentRound(String wordToGuess, List<Feedback> feedbackList) {
         Word word = new Word(wordToGuess);
         Round round = new Round(word);
-        round.getFeedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        round.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        round.makeGuess("kalkoen");
+        round.makeGuess("vrijdag");
         assertEquals(feedbackList, round.getAllFeedback());
+    }
+
+    @Test
+    @DisplayName("Throws exception when trying to make a guess after the round has been finished")
+    void throwsRoundAlreadyFinishedExeption() {
+        Word word = new Word("vrijdag");
+        Round round = new Round(word);
+        round.makeGuess("kalkoen");
+        round.makeGuess("vrijdag");
+
+        assertThrows(RoundAlreadyFinishedException.class, () -> {
+            round.makeGuess("kalkoen");
+        });
+    }
+
+    @Test
+    @DisplayName("Throws exception when trying to make a guess after the round has been finished")
+    void doesNotThrowRoundAlreadyFinishedExeption() {
+        Word word = new Word("vrijdag");
+        Round round = new Round(word);
+        round.makeGuess("kalkoen");
+
+        assertDoesNotThrow(() -> {
+            round.makeGuess("vrijdag");
+        });
     }
 
     @ParameterizedTest
     @MethodSource("provideHintExamples")
     @DisplayName("get feedback when a guess has been made")
-    void getFeedback(String attempt, String wordToGuess, List<Character> hint) {
+    void getFeedback(String attempt, String wordToGuess, Feedback feedback) {
         Word word = new Word(wordToGuess);
         Round round = new Round(word);
-        assertEquals(round.getFeedback(attempt, List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)), hint);
+        assertEquals(feedback.giveHint(wordToGuess), round.makeGuess(attempt).giveHint(wordToGuess));
     }
 
     @Test
@@ -129,15 +155,18 @@ class RoundTest {
 
     static Stream<Arguments> provideHintExamples() {
         return Stream.of(
-                Arguments.of("woord", "boord", List.of('.', 'o', 'o', 'r', 'd')),
-                Arguments.of("dansje", "diesel", List.of('d', '.', '.', 's', '.', '.')),
-                Arguments.of("boom", "kies", List.of('.', '.', '.', '.'))
+                Arguments.of("woord", "boord", new Feedback("woord")),
+                Arguments.of("dansje", "diesel", new Feedback("dansje")),
+                Arguments.of("boom", "kies", new Feedback("boom"))
         );
     }
 
     static Stream<Arguments> provideFeedbackExamples() {
         return Stream.of(
-                Arguments.of("woord", List.of(new Feedback("boord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)), new Feedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT))))
+                Arguments.of("vrijdag", List.of(new Round(new Word("vrijdag")).makeGuess("kalkoen"), new Round(new Word("vrijdag")).makeGuess("vrijdag"))),
+                Arguments.of("dinsdag", List.of(new Round(new Word("dinsdag")).makeGuess("kalkoen"), new Round(new Word("dinsdag")).makeGuess("vrijdag"))),
+                Arguments.of("maandag", List.of(new Round(new Word("maandag")).makeGuess("kalkoen"), new Round(new Word("maandag")).makeGuess("vrijdag")))
         );
     }
+
 }

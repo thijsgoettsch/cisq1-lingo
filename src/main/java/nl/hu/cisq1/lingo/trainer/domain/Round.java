@@ -3,6 +3,7 @@ package nl.hu.cisq1.lingo.trainer.domain;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import nl.hu.cisq1.lingo.trainer.domain.Feedback;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundAlreadyFinishedException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
@@ -23,19 +24,19 @@ public class Round {
     }
 
     public boolean roundFinished() {
-        if (currentTurn >= 5 || feedbackList.stream().anyMatch(Feedback::isWordGuessed)) {
-            return true;
-        }
-        return false;
+        return currentTurn >= 5 || feedbackList.stream().anyMatch(Feedback::isWordGuessed);
     }
 
-    public List<Character> getFeedback(String attempt, List<Mark> marks) {
-        Feedback feedback = new Feedback(attempt, marks);
-        feedbackList.add(feedback);
+    public Feedback makeGuess(String attempt) {
         if (!roundFinished()) {
             increaseTurn(1);
+            Feedback feedback = new Feedback(attempt);
+            feedback.giveHint(wordToGuess.getValue());
+            feedbackList.add(feedback);
+            return feedback;
         }
-        return feedback.giveHint(this.wordToGuess.getValue());
+        throw new RoundAlreadyFinishedException();
+
     }
 
     public boolean increaseTurn(Integer amount) {

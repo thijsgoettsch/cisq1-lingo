@@ -17,28 +17,30 @@ class FeedbackTest {
     @Test
     @DisplayName("Word is guessed if all letters are correct")
     void wordIsGuessed() {
-        Feedback feedback = new Feedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        Feedback feedback = new Feedback("woord");
         assertTrue(feedback.isWordGuessed());
     }
 
     @Test
     @DisplayName("Word is not guessed if not all letters are correct")
     void wordIsNotGuessed() {
-        Feedback feedback = new Feedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        Feedback feedback = new Feedback("woord");
+        feedback.giveHint("boord");
         assertFalse(feedback.isWordGuessed());
     }
 
     @Test
     @DisplayName("Guess is invalid if letters are invalid")
     void guessIsInvalid() {
-        Feedback feedback = new Feedback("woord", List.of(Mark.ABSENT, Mark.INVALID, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        Feedback feedback = new Feedback("woord");
         assertTrue(feedback.guessIsInvalid());
     }
 
     @Test
     @DisplayName("Guess is not invalid if letters are valid")
     void guessIsNotInvalid() {
-        Feedback feedback = new Feedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        Feedback feedback = new Feedback("woord");
+        feedback.giveHint("woord");
         assertFalse(feedback.guessIsInvalid());
     }
 
@@ -46,7 +48,7 @@ class FeedbackTest {
     @MethodSource("provideHintExamples")
     @DisplayName("Give hint when an attempt has been made")
     void giveHint(String attempt, String wordToGuess, List<Character> hint) {
-        Feedback feedback = new Feedback(attempt, List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        Feedback feedback = new Feedback(attempt);
         assertEquals(feedback.giveHint(wordToGuess), hint);
     }
 

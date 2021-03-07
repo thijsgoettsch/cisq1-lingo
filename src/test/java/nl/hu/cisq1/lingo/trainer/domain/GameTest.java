@@ -37,10 +37,10 @@ class GameTest {
     @ParameterizedTest
     @MethodSource("provideFinishedRoundExamples")
     @DisplayName("start a new round in the game")
-    void startNewRound(String wordToGuess, String attempt, List<Mark> marks) {
+    void startNewRound(String wordToGuess, String attempt) {
         Game lingo = new Game(player, rounds);
         lingo.startNewGame(new Word(wordToGuess));
-        lingo.getRounds().get(0).getFeedback(attempt, marks);
+        lingo.getRounds().get(0).makeGuess(attempt);
 
         lingo.startNewRound(new Word("woord"));
         assertEquals(2, lingo.getRounds().size());
@@ -58,7 +58,7 @@ class GameTest {
     void shouldNotThrowExceptionWhenThereIsNoGameActive() {
         Game lingo = new Game(player, rounds);
         lingo.startNewGame(new Word("woord"));
-        lingo.getRounds().get(0).getFeedback("woord", List.of(Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT));
+        lingo.getRounds().get(0).makeGuess("woord");
 
         assertDoesNotThrow(() -> {
             lingo.startNewRound(new Word("hallo"));
@@ -68,15 +68,15 @@ class GameTest {
     @ParameterizedTest
     @MethodSource("provideUnfinishedRoundExamples")
     @DisplayName("throws an exception when trying to start a new round while there is still a round that has not been finished")
-    void throwExceptionOnUnfinishedRound(String wordToGuess, String attempt, List<Mark> marks) {
+    void throwExceptionOnUnfinishedRound(String wordToGuess, String attempt) {
         Word word = new Word(wordToGuess);
         Game lingo = new Game(player, rounds);
 
         lingo.startNewGame(new Word("woord"));
-        lingo.getRounds().get(0).getFeedback("woord", List.of(Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT));
+        lingo.getRounds().get(0).makeGuess("woord");
 
         Round newRound = new Round(word);
-        newRound.getFeedback(attempt, marks);
+        newRound.makeGuess(attempt);
         rounds.add(newRound);
 
         assertThrows(RoundNotFinishedException.class, () -> {
@@ -87,15 +87,15 @@ class GameTest {
     @ParameterizedTest
     @MethodSource("provideFinishedRoundExamples")
     @DisplayName("should not throw an exception when trying to start a new round while all the rounds are finished")
-    void shouldNotThrowExceptionOnFinishedRound(String wordToGuess, String attempt, List<Mark> marks) {
+    void shouldNotThrowExceptionOnFinishedRound(String wordToGuess, String attempt) {
         Word word = new Word(wordToGuess);
 
         Game lingo = new Game(player, rounds);
         lingo.startNewGame(new Word("woord"));
-        lingo.getRounds().get(0).getFeedback("woord", List.of(Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT));
+        lingo.getRounds().get(0).makeGuess("woord");
 
         Round newRound = new Round(word);
-        newRound.getFeedback(attempt, marks);
+        newRound.makeGuess(attempt);
         rounds.add(newRound);
 
         assertDoesNotThrow(() -> {
@@ -106,15 +106,15 @@ class GameTest {
     @Test
     @DisplayName("calculate the total score")
     void calculateScore() {
-        Word word = new Word("test");
+        Word word = new Word("boord");
         Game lingo = new Game(player, rounds);
 
         Round newRound = new Round(word);
-        newRound.getFeedback("woord", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
-        newRound.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        newRound.makeGuess("woord");
+        newRound.makeGuess("boord");
 
         Round newRound2 = new Round(word);
-        newRound2.getFeedback("woord", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT));
+        newRound2.makeGuess("boord");
         rounds.add(newRound);
         rounds.add(newRound2);
 
@@ -157,19 +157,39 @@ class GameTest {
         assertFalse(lingo.gameActive());
     }
 
+    @Test
+    @DisplayName("get the total score of the game")
+    void getTotalScore() {
+        Game lingo = new Game(player, rounds);
+        assertEquals(0, lingo.getTotalScore());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideFinishedRoundExamples")
+    @DisplayName("make a guess")
+    void makeGuess(String wordToGuess, String attempt) {
+        Game lingo = new Game(player, rounds);
+        lingo.startNewGame(new Word(wordToGuess));
+
+        Round actual = new Round(new Word(wordToGuess));
+        actual.makeGuess(attempt);
+
+        assertEquals(lingo.makeGuess(attempt), actual);
+    }
+
     static Stream<Arguments> provideFinishedRoundExamples() {
         return Stream.of(
-                Arguments.of("tosti", "tosti", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)),
-                Arguments.of("hallo", "hallo", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)),
-                Arguments.of("zestig", "zestig", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT))
+                Arguments.of("tosti", "tosti"),
+                Arguments.of("hallo", "hallo"),
+                Arguments.of("zestig", "zestig")
         );
     }
 
     static Stream<Arguments> provideUnfinishedRoundExamples() {
         return Stream.of(
-                Arguments.of("tosti", "josti", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)),
-                Arguments.of("hallo", "haloo", List.of(Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.PRESENT, Mark.CORRECT)),
-                Arguments.of("bestig", "westig", List.of(Mark.ABSENT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT, Mark.CORRECT))
+                Arguments.of("tosti", "josti"),
+                Arguments.of("hallo", "haloo"),
+                Arguments.of("bestig", "westig")
         );
     }
 

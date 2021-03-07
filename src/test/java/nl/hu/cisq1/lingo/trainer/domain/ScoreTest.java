@@ -47,11 +47,11 @@ class ScoreTest {
 
     static Stream<Arguments> provideTurnNumbers() {
         return Stream.of(
-                Arguments.of(0, 25),
-                Arguments.of(1, 20),
-                Arguments.of(2, 15),
-                Arguments.of(3, 10),
-                Arguments.of(4, 5)
+                Arguments.of(1, 25),
+                Arguments.of(2, 20),
+                Arguments.of(3, 15),
+                Arguments.of(4, 10),
+                Arguments.of(5, 5)
                 );
     }
 }
