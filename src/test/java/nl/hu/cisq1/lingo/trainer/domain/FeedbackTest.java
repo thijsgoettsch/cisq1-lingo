@@ -52,11 +52,28 @@ class FeedbackTest {
         assertEquals(feedback.giveHint(wordToGuess), hint);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideMarkExamples")
+    @DisplayName("generate marks when making a guess")
+    void generateMarks(String wordToGuess, String attempt, List<Mark> marks) {
+        Feedback feedback = new Feedback(attempt);
+        assertEquals(feedback.generateMarks(wordToGuess), marks);
+    }
+
     static Stream<Arguments> provideHintExamples() {
         return Stream.of(
                 Arguments.of("woord", "boord", List.of('.', 'o', 'o', 'r', 'd')),
                 Arguments.of("dansje", "diesel", List.of('d', '.', '.', 's', '.', '.')),
                 Arguments.of("boom", "kies", List.of('.', '.', '.', '.'))
         );
+    }
+
+    static Stream<Arguments> provideMarkExamples() {
+        return Stream.of(
+                Arguments.of("fiets", "fiets", List.of(Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT)),
+                Arguments.of("biertje", "viertje", List.of(Mark.ABSENT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT, Mark.CORRECT, Mark.CORRECT)),
+                Arguments.of("geel", "fiets", List.of(Mark.INVALID,Mark.INVALID,Mark.INVALID,Mark.INVALID, Mark.INVALID)),
+                Arguments.of("auto", "outo", List.of(Mark.PRESENT,Mark.CORRECT,Mark.CORRECT,Mark.CORRECT))
+                );
     }
 }

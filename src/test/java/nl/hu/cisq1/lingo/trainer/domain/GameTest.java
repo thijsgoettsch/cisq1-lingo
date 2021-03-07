@@ -1,6 +1,7 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.GameIsNotActiveException;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundAlreadyFinishedException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundNotFinishedException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 import org.junit.jupiter.api.BeforeEach;
@@ -175,6 +176,26 @@ class GameTest {
         actual.makeGuess(attempt);
 
         assertEquals(lingo.makeGuess(attempt), actual);
+    }
+
+    @Test
+    @DisplayName("make a guess shold throw game is not active exception because there is no game active")
+    void makeGuessShouldThrowGameIsNotActiveException() {
+        Game lingo = new Game(player, rounds);
+        assertThrows(GameIsNotActiveException.class, () -> {
+            lingo.makeGuess("kalkoen");
+        });
+    }
+
+    @Test
+    @DisplayName("make a guess shold throw round already finished exception because a round is already finished")
+    void makeGuessShouldThrowRoundAlreadyFinishedException() {
+        Game lingo = new Game(player, rounds);
+        lingo.startNewGame(new Word("woord"));
+        lingo.makeGuess("woord");
+        assertThrows(RoundAlreadyFinishedException.class, () -> {
+            lingo.makeGuess("woord");
+        });
     }
 
     static Stream<Arguments> provideFinishedRoundExamples() {
