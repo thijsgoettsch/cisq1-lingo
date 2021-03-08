@@ -1,6 +1,7 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import lombok.Getter;
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.GameIsLostException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.GameIsNotActiveException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundAlreadyFinishedException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundNotFinishedException;
@@ -13,36 +14,37 @@ public class Game {
     private Player player;
     private List<Round> rounds;
     private Round currentRound;
-    private boolean isGameActive;
+    private GameStatus gameStatus;
     @Getter
     private int totalScore;
 
     public Game(Player player, List<Round> rounds) {
         this.player = player;
         this.rounds = rounds;
-        this.isGameActive = false;
+        this.gameStatus = GameStatus.NOT_ACTIVE;
     }
 
     public void startNewGame(Word word) {
-        this.isGameActive = true;
+        this.gameStatus = GameStatus.ONGOING;
         startNewRound(word);
-
     }
 
     public void startNewRound(Word word) {
-        if (!isGameActive) {
+        if (this.gameStatus == GameStatus.NOT_ACTIVE) {
             throw new GameIsNotActiveException();
         }
         if (!rounds.stream().allMatch(Round::roundFinished)) {
             throw new RoundNotFinishedException();
         }
-
+        if (gameLost() == GameStatus.LOST) {
+            throw new GameIsLostException();
+        }
         Round round = new Round(word);
         rounds.add(round);
     }
 
     public Round makeGuess(String attempt) {
-        if (!isGameActive) {
+        if (this.gameStatus == GameStatus.NOT_ACTIVE) {
             throw new GameIsNotActiveException();
         }
         if (rounds.stream().allMatch(Round::roundFinished)) {
@@ -83,8 +85,15 @@ public class Game {
         return this.rounds;
     }
 
-    public boolean gameActive() {
-        return this.isGameActive;
+    public GameStatus getGameStatus() {
+        return this.gameStatus;
+    }
+
+    public GameStatus gameLost() {
+        if(this.rounds.stream().anyMatch(Round::roundLost)) {
+            this.gameStatus = GameStatus.LOST;
+        }
+        return gameStatus;
     }
 
 }

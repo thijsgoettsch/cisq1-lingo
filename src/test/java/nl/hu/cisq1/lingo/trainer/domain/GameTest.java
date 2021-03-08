@@ -1,5 +1,6 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
+import nl.hu.cisq1.lingo.trainer.domain.exceptions.GameIsLostException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.GameIsNotActiveException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundAlreadyFinishedException;
 import nl.hu.cisq1.lingo.trainer.domain.exceptions.RoundNotFinishedException;
@@ -144,18 +145,18 @@ class GameTest {
 
     @Test
     @DisplayName("there is a game active")
-    void gameIsActive() {
+    void gameIsStarted() {
         Word word = new Word("woord");
         Game lingo = new Game(player, rounds);
         lingo.startNewGame(word);
-        assertTrue(lingo.gameActive());
+        assertEquals(lingo.getGameStatus(), GameStatus.ONGOING);
     }
 
     @Test
     @DisplayName("there isn't a game active")
-    void gameIsNotActive() {
+    void gameIsNotStarted() {
         Game lingo = new Game(player, rounds);
-        assertFalse(lingo.gameActive());
+        assertEquals(lingo.getGameStatus(), GameStatus.NOT_ACTIVE);
     }
 
     @Test
@@ -188,15 +189,30 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("make a guess shold throw round already finished exception because a round is already finished")
-    void makeGuessShouldThrowRoundAlreadyFinishedException() {
+    @DisplayName("make a guess should throw game is lost exception when trying to start a new round after the player lost the round")
+    void shouldThrowGameIsLostException() {
         Game lingo = new Game(player, rounds);
-        lingo.startNewGame(new Word("woord"));
-        lingo.makeGuess("woord");
-        assertThrows(RoundAlreadyFinishedException.class, () -> {
-            lingo.makeGuess("woord");
+        lingo.startNewGame(new Word("dagwerk"));
+        lingo.makeGuess("kalkoen");
+        lingo.makeGuess("kalkoen");
+        lingo.makeGuess("kalkoen");
+        lingo.makeGuess("kalkoen");
+        lingo.makeGuess("kalkoen");
+        assertThrows(GameIsLostException.class, () -> {
+            lingo.startNewGame(new Word("daghuur"));
         });
     }
+
+//    @Test
+//    @DisplayName("make a guess shold throw round already finished exception because a round is already finished")
+//    void makeGuessShouldThrowRoundAlreadyFinishedException() {
+//        Game lingo = new Game(player, rounds);
+//        lingo.startNewGame(new Word("woord"));
+//        lingo.makeGuess("woord");
+//        assertThrows(RoundAlreadyFinishedException.class, () -> {
+//            lingo.makeGuess("woord");
+//        });
+//    }
 
     static Stream<Arguments> provideFinishedRoundExamples() {
         return Stream.of(

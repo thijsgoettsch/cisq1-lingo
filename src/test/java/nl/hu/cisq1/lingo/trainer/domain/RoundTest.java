@@ -50,6 +50,32 @@ class RoundTest {
     }
 
     @Test
+    @DisplayName("round is lost when player has 5 turns and didnt guess the correct word")
+    void roundIsLostOnTooManyTurns() {
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        assertTrue(round.roundLost());
+    }
+
+    @Test
+    @DisplayName("round is lost when player has 5 turns and didnt guess the correct word")
+    void roundIsNotLost() {
+        Word word = new Word("woord");
+        Round round = new Round(word);
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("boord");
+        round.makeGuess("woord");
+        assertFalse(round.roundLost());
+    }
+
+    @Test
     @DisplayName("Increase turn number when word has not been guessed")
     void increaseTurnNumber() {
         Word word = new Word("woord");

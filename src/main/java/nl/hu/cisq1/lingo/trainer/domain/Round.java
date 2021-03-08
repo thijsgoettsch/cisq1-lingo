@@ -66,5 +66,12 @@ public class Round {
         return this.wordToGuess.getLength();
     }
 
+    public boolean roundLost() {
+        if (this.currentTurn >= 5 && feedbackList.stream().noneMatch(Feedback::isWordGuessed)) {
+            return true;
+        }
+        return false;
+    }
+
 }
 
