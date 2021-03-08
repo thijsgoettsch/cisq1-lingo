@@ -39,6 +39,16 @@ public class Round {
 
     }
 
+    public List<Character> provideFirstLetter() {
+        List<Character> firstLetter = new ArrayList<>();
+        char[] word = this.wordToGuess.getValue().toLowerCase().toCharArray();
+        firstLetter.add(word[0]);
+        for (int i = 1; i < word.length; i++) {
+            firstLetter.add('.');
+        }
+        return firstLetter;
+    }
+
     public boolean increaseTurn(Integer amount) {
         if (!roundFinished()) {
             if (feedbackList.stream().noneMatch(Feedback::isWordGuessed)) {

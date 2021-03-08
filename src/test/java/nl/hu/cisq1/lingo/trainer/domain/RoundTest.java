@@ -179,6 +179,23 @@ class RoundTest {
         assertEquals(new Score(1), round.roundScore());
     }
 
+    @ParameterizedTest
+    @MethodSource("provideFirstLetterExamples")
+    @DisplayName("gives first letter of a word")
+    void givesFirstLetterOfWordToGuess(String wordToGuess, List<Character> firstHint) {
+        Word word = new Word(wordToGuess);
+        Round round = new Round(word);
+        assertEquals(firstHint, round.provideFirstLetter());
+    }
+
+    static Stream<Arguments> provideFirstLetterExamples() {
+        return Stream.of(
+                Arguments.of("woord",List.of('w', '.', '.', '.', '.')),
+                Arguments.of("zestig",List.of('z', '.', '.', '.', '.', '.')),
+                Arguments.of("dansjes",List.of('d', '.', '.', '.', '.', '.', '.'))
+                );
+    }
+
     static Stream<Arguments> provideHintExamples() {
         return Stream.of(
                 Arguments.of("woord", "boord", new Feedback("woord")),
